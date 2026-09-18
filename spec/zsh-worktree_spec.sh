@@ -118,4 +118,24 @@ EOF
       The status should be failure
     End
   End
+  Describe 'empty picker results'
+    It 'returns failure without changing directory when fzf succeeds without a choice'
+      run_it() {
+        mkdir -p "$TMPROOT/repo"
+        builtin cd "$TMPROOT/repo"
+        git init -q
+        git -c user.email=t@t -c user.name=t -c commit.gpgsign=false commit -q --allow-empty -m init
+        git worktree add -q "$TMPROOT/other" -b other
+        fake_fzf ''
+        wtree
+        local rc=$?
+        print -r -- "$PWD"
+        return $rc
+      }
+      When call run_it
+      The status should be failure
+      The output should equal "$TMPROOT/repo"
+    End
+  End
+
 End
