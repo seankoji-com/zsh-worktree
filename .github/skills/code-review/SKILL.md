@@ -15,7 +15,9 @@ zsh-worktree is a single-purpose plugin: two functions in one ~40-line file. Nea
 - When plugin logic changes, confirm `spec/zsh-worktree_spec.sh` grew a matching case rather than just re-asserting old behavior.
 
 ## Do not spend attention here
-- `.github/workflows/*.yml` — synced from the org's central `seankoji-com/.github` template repo (three of the last five PRs are exactly this sync); review the upstream repo, not the copy here.
+- Unchanged `call-reusable-*.yml` template content can be checked against
+  the central source. Review local workflow changes, including caller
+  triggers, permissions, runner choices, and pinned revisions.
 - `README.md`, `LICENSE`, `.gitignore` — docs and boilerplate, no logic.
 - `.shellspec`, `spec/spec_helper.sh` — a couple of lines of test-framework config each, not logic.
 
