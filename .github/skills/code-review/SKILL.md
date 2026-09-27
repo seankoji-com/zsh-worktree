@@ -14,10 +14,13 @@ zsh-worktree is a single-purpose plugin: two functions in one ~40-line file. Nea
 - The `fzf` vs `select` fallback branch and the fzf-cancelled (exit 130) path in `wtree` — interactive control flow that only the faked-fzf tests exercise; easy to regress unnoticed.
 - When plugin logic changes, confirm `spec/zsh-worktree_spec.sh` grew a matching case rather than just re-asserting old behavior.
 
+- Review local workflow changes, including reusable caller triggers,
+  permissions, runner choices, and pinned revisions.
+
 ## Do not spend attention here
-- Unchanged `call-reusable-*.yml` template content can be checked against
-  the central source. Review local workflow changes, including caller
-  triggers, permissions, runner choices, and pinned revisions.
+
+- Unchanged reusable workflow template content can be checked against its
+  central source; review any local changes.
 - `README.md`, `LICENSE`, `.gitignore` — docs and boilerplate, no logic.
 - `.shellspec`, `spec/spec_helper.sh` — a couple of lines of test-framework config each, not logic.
 
