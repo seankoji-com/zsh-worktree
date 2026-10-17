@@ -36,6 +36,15 @@ EOF
     hash -r
   }
 
+  fake_fzf_from_input() {
+    mkdir -p "$TMPROOT/bin"
+    # Select an actual input row so the test detects corruption before fzf.
+    printf '#!/bin/sh\nsed -n "2p"\n' > "$TMPROOT/bin/fzf"
+    chmod +x "$TMPROOT/bin/fzf"
+    PATH="$TMPROOT/bin:$BASE_PATH"
+    hash -r
+  }
+
   Describe 'worktree_list'
     It 'fails outside a git repository'
       run_it() { builtin cd "$TMPROOT"; worktree_list; }
@@ -98,6 +107,37 @@ EOF
       }
       When call run_it
       The output should equal "$TMPROOT/wt-feature"
+    End
+
+    It 'preserves literal backslash sequences in picker input'
+      run_it() {
+        mkdir -p "$TMPROOT/repo" && builtin cd "$TMPROOT/repo"
+        git init -q
+        git -c user.email=t@t -c user.name=t commit -q --allow-empty -m init
+        git worktree add -q "$TMPROOT/wt\\nfeature" -b feature
+        fake_fzf_from_input
+        wtree || return
+        print -r -- "$PWD"
+      }
+      When call run_it
+      The status should be success
+      The output should equal "$TMPROOT/wt\\nfeature"
+    End
+
+    It 'preserves spaces in picker input with SH_WORD_SPLIT enabled'
+      run_it() {
+        mkdir -p "$TMPROOT/repo" && builtin cd "$TMPROOT/repo"
+        git init -q
+        git -c user.email=t@t -c user.name=t commit -q --allow-empty -m init
+        git worktree add -q "$TMPROOT/wt feature" -b feature
+        fake_fzf_from_input
+        setopt localoptions shwordsplit
+        wtree || return
+        print -r -- "$PWD"
+      }
+      When call run_it
+      The status should be success
+      The output should equal "$TMPROOT/wt feature"
     End
 
     It 'stays put when the picker is cancelled'
