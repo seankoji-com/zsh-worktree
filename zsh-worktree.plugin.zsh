@@ -37,10 +37,10 @@ wtree() {
     local -a fzf_args
     fzf_args=(--prompt='worktree ❯ ' --height=40% --reverse)
     [[ -n "$ZSH_WORKTREE_PREVIEW" ]] && fzf_args+=(--preview="$ZSH_WORKTREE_PREVIEW")
-    dir=$(print -l -- $dirs | fzf $fzf_args) || return
+    dir=$(print -r -l -- "${dirs[@]}" | fzf "${fzf_args[@]}") || return
   else
     PS3='worktree ❯ '
-    select dir in $dirs; do [[ -n "$dir" ]] && break; done
+    select dir in "${dirs[@]}"; do [[ -n "$dir" ]] && break; done
   fi
 
   [[ -n "$dir" ]] || return 1
