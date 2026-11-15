@@ -13,7 +13,13 @@
 # List worktree paths, one per line. Public so it can be reused.
 worktree_list() {
   command git rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 1
-  command git worktree list --porcelain 2>/dev/null | awk '/^worktree /{print substr($0, 10)}'
+  command git worktree list --porcelain 2>/dev/null | awk '
+    function emit() { if (path != "" && !skip) print path; path = ""; skip = 0 }
+    /^worktree / { path = substr($0, 10) }
+    /^bare$/ || /^prunable( |$)/ { skip = 1 }
+    /^$/ { emit() }
+    END { emit() }
+  '
 }
 
 wtree() {
