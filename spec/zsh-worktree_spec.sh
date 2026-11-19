@@ -73,6 +73,22 @@ EOF
       When call run_it
       The output should include "$TMPROOT/my repo"
     End
+    It 'excludes bare and prunable entries while retaining valid linked worktrees'
+      run_it() {
+        git init -q "$TMPROOT/seed"
+        git -C "$TMPROOT/seed" -c user.email=t@t -c user.name=t -c commit.gpgsign=false commit -q --allow-empty -m init
+        git clone -q --bare "$TMPROOT/seed" "$TMPROOT/bare repo"
+        git --git-dir="$TMPROOT/bare repo" worktree add -q "$TMPROOT/valid one" -b valid-one
+        git --git-dir="$TMPROOT/bare repo" worktree add -q "$TMPROOT/valid-two" -b valid-two
+        git --git-dir="$TMPROOT/bare repo" worktree add -q "$TMPROOT/stale" -b stale
+        rm -rf "$TMPROOT/stale"
+        builtin cd "$TMPROOT/valid one"
+        worktree_list
+      }
+      When call run_it
+      The status should be success
+      The output should equal "$(printf '%s\n%s' "$TMPROOT/valid one" "$TMPROOT/valid-two")"
+    End
   End
 
   Describe 'wtree'
