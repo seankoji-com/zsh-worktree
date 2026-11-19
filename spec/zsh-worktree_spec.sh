@@ -73,6 +73,24 @@ EOF
       When call run_it
       The output should include "$TMPROOT/my repo"
     End
+
+    It 'excludes a missing locked worktree but keeps an available locked worktree'
+      run_it() {
+        git init -q "$TMPROOT/repo"
+        git -C "$TMPROOT/repo" -c user.email=t@t -c user.name=t -c commit.gpgsign=false commit -q --allow-empty -m init
+        git -C "$TMPROOT/repo" worktree add -q "$TMPROOT/available worktree" -b available
+        git -C "$TMPROOT/repo" worktree lock "$TMPROOT/available worktree"
+        git -C "$TMPROOT/repo" worktree add -q "$TMPROOT/missing worktree" -b missing
+        git -C "$TMPROOT/repo" worktree lock "$TMPROOT/missing worktree"
+        mv "$TMPROOT/missing worktree" "$TMPROOT/moved worktree"
+        builtin cd "$TMPROOT/repo"
+        worktree_list
+      }
+      When call run_it
+      The status should be success
+      The output should equal "$(printf '%s\n%s' "$TMPROOT/repo" "$TMPROOT/available worktree")"
+    End
+
     It 'excludes bare and prunable entries while retaining valid linked worktrees'
       run_it() {
         git init -q "$TMPROOT/seed"
